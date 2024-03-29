@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
 // importing Gifted Chat library
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
+// importing functions from firebase/firestore
+import { collection, getDocs, addDoc, onSnapshot, orderBy, query } from "firebase/firestore";
 
-const ChatScreen = ({ route, navigation }) => {
+const ChatScreen = ({ route, navigation, db }) => {
   const [messages, setMessages] = useState([]);
-  const { name, background } = route.params;
+  const { name, background, userID } = route.params;
+
   const onSend = (newMessages) => {
-    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages))
+    // saving messages on the Firestore database
+    addDoc(collection(db, "messages"), newMessages[0])
+    // setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages))
   }
 
   // creating renderBubble function
@@ -25,31 +30,31 @@ const ChatScreen = ({ route, navigation }) => {
     />
   }
 
-  // setter method of the messages state, setMessages()
-  useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: "Hello developer",
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-          avatar: "https://placeimg.com/140/140/any",
-        },
-      },
-      {
-        _id: 2,
-        text: 'This is a system message',
-        createdAt: new Date(),
-        system: true,
-      },
-    ]);
-  }, []);
-
   useEffect(() => {
     navigation.setOptions({ title: name });
   }, []);
+
+  // setter method of the messages state, setMessages() - removed at task 5.3
+  useEffect(() => {
+    // navigation.setOptions({ title: name });
+    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+    const unsubMessages = onSnapshot(q, (docs) => {
+      let newMessages = [];
+      docs.forEach(doc => {
+        newMessages.push({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: new Date(doc.data().createdAt.toMillis())
+        })
+      })
+      setMessages(newMessages);
+    })
+    return () => {
+      if (unsubMessages) unsubMessages();
+    }
+  }, []);
+
+
 
   // rendering chat interface
   return (
@@ -59,25 +64,18 @@ const ChatScreen = ({ route, navigation }) => {
         renderBubble={renderBubble}
         onSend={messages => onSend(messages)}
         user={{
-          _id: 1
+          _id: userID || '', // Using an empty string as fallback if userID is undefined or null
+          name
         }}
       />
       {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
     </View>
   )
-
-  // return (
-  //   <View style={[styles.container, { backgroundColor: background }]}>
-  //     <Text>Welcome to the chat</Text>
-  //   </View>
-  // );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     width: '100%',
     height: '100%',
   }
