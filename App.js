@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, LogBox, Alert, View } from 'react-native';
 // import screens
 import StartScreen from './components/Start';
 import ChatScreen from './components/Chat';
@@ -8,25 +8,26 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // importing Firestore database
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, disableNetwork, enableNetwork } from "firebase/firestore";
+// importing netinfo
+import { useNetInfo } from "@react-native-community/netinfo";
+import { useEffect } from 'react';
+
+LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 // added AsyncStorage to prevent Terminal error - code provided by Terminal(not working properly)
 // import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 // import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-// const auth = initializeAuth(app, {
+// const auth = initializeAuth(App, {
 //   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 // });
-
-// add LogBox to prevent AsyncStorage warning message
-// import { LogBox } from 'react-native';
-// LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 // Create the navigator
 const Stack = createNativeStackNavigator();
 
 
 const App = () => {
-
+  const connectionStatus = useNetInfo();
   // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyD2ygK_X_yB6298_cLTBJW0gd4Lzsfnk3I",
@@ -42,12 +43,22 @@ const App = () => {
   // Initialize Cloud Firestore and get a reference to the service
   const db = getFirestore(app);
 
+  // network connectivity status
+  useEffect(() => {
+    if (connectionStatus.isConnected === false) {
+      Alert.alert("No network connection!");
+      disableNetwork(db);
+    } else if (connectionStatus.isConnected === true) {
+      enableNetwork(db);
+    }
+  }, [connectionStatus.isConnected]);
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">
         <Stack.Screen name="Start" component={StartScreen} />
         <Stack.Screen name="Chat">
-          {props => <ChatScreen db={db} {...props} />}
+          {props => <ChatScreen isConnected={connectionStatus.isConnected} db={db} {...props} />}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

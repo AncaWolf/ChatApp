@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ImageBackground, StyleSheet, View, Text, Button, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { ImageBackground, StyleSheet, View, Text, Button, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 // importing firebase/auth package
 import { getAuth, signInAnonymously } from "firebase/auth"
 
@@ -16,7 +16,7 @@ const StartScreen = ({ navigation }) => {
         Alert.alert("Signed in Successfully!");
       })
       .catch((error) => {
-        Alert.alert("Unable to sign in, try later again.");
+        Alert.alert("Unable to sign in, try again later.");
       })
   }
 
