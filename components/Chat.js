@@ -3,6 +3,7 @@ import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import { collection, addDoc, onSnapshot, orderBy, query } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from './CustomActions';
 
 const ChatScreen = ({ route, navigation, db, isConnected }) => {
   const [messages, setMessages] = useState([]);
@@ -81,7 +82,10 @@ const ChatScreen = ({ route, navigation, db, isConnected }) => {
     }
   }, [isConnected]);
 
-
+  //added function for circle button
+  const renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
 
   // rendering chat interface
   return (
@@ -90,6 +94,7 @@ const ChatScreen = ({ route, navigation, db, isConnected }) => {
         messages={messages}
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
+        renderActions={renderCustomActions} //added prop for accessory bar
         onSend={messages => onSend(messages)}
         user={{
           _id: userID || '', // Using an empty string as fallback if userID is undefined or null
