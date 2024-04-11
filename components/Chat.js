@@ -56,6 +56,7 @@ const ChatScreen = ({ route, navigation, db, isConnected }) => {
   useEffect(() => {
     // Always load cached messages when the component mounts
     loadCachedMessages();
+    // navigation.setOptions({ title: name });
 
     if (isConnected === true) {
       // unregister current onSnapshot() listener to avoid registering multiple listeners when useEffect code is re-executed.
