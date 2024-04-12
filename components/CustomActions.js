@@ -7,8 +7,6 @@ import * as Location from 'expo-location';
 const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID }) => {
     const actionSheet = useActionSheet();
 
-    const newUploadRef = ref(storage, 'image123');
-
     const onActionPress = () => {
         const options = ['Choose From Library', 'Take Picture', 'Send Location', 'Cancel'];
         const cancelButtonIndex = options.length - 1;
@@ -27,6 +25,7 @@ const CustomActions = ({ wrapperStyle, iconTextStyle, onSend, storage, userID })
                         return;
                     case 2:
                         getLocation();
+                        return;
                     default:
                 }
             }

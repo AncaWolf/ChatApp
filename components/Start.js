@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ImageBackground, StyleSheet, View, Text, Button, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
+import { ImageBackground, StyleSheet, View, Text, Button, TextInput, TouchableOpacity, Platform, Alert, KeyboardAvoidingView } from 'react-native';
 // importing firebase/auth package
 import { getAuth, signInAnonymously } from "firebase/auth"
 
@@ -43,10 +43,9 @@ const StartScreen = ({ navigation }) => {
               />
             ))}
           </View>
-          {/* Start Chat by navigating to Chat screen \*/}
+          {/* Navigating to Chat screen \*/}
           <TouchableOpacity
             style={styles.button} onPress={signInUser}
-          // style={styles.button} onPress={() => navigation.navigate('Chat', { name: name, background: background })}
           >
             <Text style={styles.buttonText}>Start Chatting</Text>
           </TouchableOpacity>

@@ -45,7 +45,7 @@ const ChatScreen = ({ route, navigation, db, isConnected, storage }) => {
     }
 
     const loadCachedMessages = async () => {
-        const cachedMessages = await AsyncStorage.getItem("messages") || '[]';
+        const cachedMessages = await AsyncStorage.getItem("messages") || [];
         setMessages(JSON.parse(cachedMessages));
     };
 
@@ -86,7 +86,7 @@ const ChatScreen = ({ route, navigation, db, isConnected, storage }) => {
 
     //added function for circle button
     const renderCustomActions = (props) => {
-        return <CustomActions storage={storage} {...props} />;
+        return <CustomActions onSend={onSend} userID={userID} storage={storage} {...props} />;
     };
     //added function for rendering map
     const renderCustomView = (props) => {
@@ -124,7 +124,7 @@ const ChatScreen = ({ route, navigation, db, isConnected, storage }) => {
                 onSend={messages => onSend(messages)}
                 user={{
                     _id: userID || '', // Using an empty string as fallback if userID is undefined or null
-                    name
+                    name: name,
                 }}
             />
             {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
